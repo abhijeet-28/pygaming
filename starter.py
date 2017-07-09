@@ -1,59 +1,154 @@
-import pygame
+import pygame,time,random
+from collections import Counter
 pygame.init()
 max_width=600
 max_height=500
 gameDisplay=pygame.display.set_mode((max_width,max_height))
 pygame.display.set_caption("snake")
 
+font_chosen=pygame.font.SysFont(None,25)
+def write_text(message,color):
+	rendering=font_chosen.render(message,True,color)
+	gameDisplay.blit(rendering,[max_width/5,max_height/5])	
 
 white=(255,255,255)
 black=(0,0,0)
 red=(255,0,0)
+snake_size=10
+apple_size=10
+clock=pygame.time.Clock()
 
-x=200
-y=200
-speed_x=0
-speed_y=0
+def snakecheck(all_points):
+	seen=[]
+	for pt in all_points:
+		if(pt in seen):
+			return False
+		else:
+			seen.append(pt)
+	return True
 
-pygame.display.update()
-exit=False
-while not exit:
-	pygame.display.set_caption("Snake")
-	for event in pygame.event.get():
-		
-		if event.type==pygame.QUIT:
-			exit=True
-		if event.type==pygame.KEYDOWN:
-			if(event.key==pygame.K_ESCAPE):
-				exit=True
-			if(event.key==pygame.K_LEFT):
-				speed_x=-1
-				speed_y=0
-			elif(event.key==pygame.K_RIGHT):
-				speed_x=1
-				speed_y=0
-			elif(event.key==pygame.K_UP):
-				speed_x=0
-				speed_y=-1
-			elif(event.key==pygame.K_DOWN):
-				speed_x=0
-				speed_y=1
-	if(x+20>max_width and speed_x>0):
-		speed_x=0
-	if(x<0 and speed_x<0):
-		speed_x=0
-	if(y+20>max_height and speed_y>0):
-		speed_y=0
-	if(y<0 and speed_y<0):
-		speed_y=0
-	x+=speed_x
-	y+=speed_y
-	
-	
-	gameDisplay.fill(white)
-	pygame.draw.rect(gameDisplay,red,[x,y,20,20])
+def snakecheck2(all_points):
+	head=all_points[-1]
+	for i in range(0,len(all_points)-1):
+		if(head==all_points[i]):
+			return False
+	return True
+
+
+def snake(points):
+	for point in points:
+		pygame.draw.rect(gameDisplay,black,[point[0],point[1],snake_size,snake_size])
+
+
+def loop():
+	all_points=[]
+	snakelength=1
+	x=200
+	y=200
+	speed_x=0
+	speed_y=0
+	speed=10
+
 	pygame.display.update()
 
+	exit=False
+	end=False
 
-pygame.quit()
-quit()
+	apple_x=(random.randrange(0,max_width)/10)*10
+	apple_y=(random.randrange(0,max_height)/10)*10
+
+	while not exit:
+		pygame.display.set_caption(str(apple_x)+" "+str(apple_y) )
+
+		while(end==True):
+
+			write_text("Press space key to play again",red)
+			all_points=[]
+			pygame.display.update()
+			for event in pygame.event.get():
+				if(event.type==pygame.KEYDOWN):
+					if(event.key==pygame.K_ESCAPE):
+						end=False
+						exit=True
+						break
+					elif(event.key==pygame.K_SPACE):
+						exit=False
+						end=False
+						loop()
+
+		for event in pygame.event.get():
+			
+			if event.type==pygame.QUIT:
+				end=True
+				exit=True
+			if event.type==pygame.KEYDOWN:
+				if(event.key==pygame.K_ESCAPE):
+					exit=True
+					
+				if(event.key==pygame.K_LEFT):
+					speed_x=-speed
+					speed_y=0
+				elif(event.key==pygame.K_RIGHT):
+					speed_x=speed
+					speed_y=0
+				elif(event.key==pygame.K_UP):
+					speed_x=0
+					speed_y=-speed
+				elif(event.key==pygame.K_DOWN):
+					speed_x=0
+					speed_y=speed
+		if(x+20>max_width and speed_x>0):
+			end=True
+		if(x<0 and speed_x<0):
+			end=True
+		if(y+20>max_height and speed_y>0):
+			end=True
+		if(y<0 and speed_y<0):
+			end=True
+		x+=speed_x
+		y+=speed_y
+		
+		start_point=[x,y]
+
+		all_points.append(start_point)
+		
+		gameDisplay.fill(white)
+		pygame.draw.rect(gameDisplay,red,[apple_x,apple_y,apple_size,apple_size])
+
+		if(len(all_points)>snakelength):
+			del all_points[0]
+		
+		# if(len(list(set(all_points))) != len(all_points)):
+		# 	end=True
+		print start_point
+		print all_points
+		print "---"
+		
+		check=snakecheck2(all_points)
+		if(check==False):
+			end=True
+
+		
+		snake(all_points)
+		pygame.display.update()
+
+		# if(x==apple_x and y==apple_y):
+		# 	apple_x=(random.randrange(0,max_width)/10)*10
+		# 	apple_y=(random.randrange(0,max_height)/10)*10
+		# 	snakelength+=1
+
+
+		if(x>=apple_x and x<=apple_x+apple_size):
+			if(y>=apple_y and y<apple_y+apple_size):
+				apple_x=(random.randrange(0,max_width)/10)*10
+				apple_y=(random.randrange(0,max_height)/10)*10
+				snakelength+=1
+
+		clock.tick(30)
+	pygame.quit()
+	quit()
+
+loop()
+write_text("You lose",red)
+pygame.display.update()
+
