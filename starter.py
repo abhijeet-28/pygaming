@@ -9,14 +9,19 @@ pygame.display.set_caption("snake")
 font_chosen=pygame.font.SysFont(None,25)
 def write_text(message,color):
 	rendering=font_chosen.render(message,True,color)
-	gameDisplay.blit(rendering,[max_width/5,max_height/5])	
+	area=rendering.get_rect()
+	area.center=max_width/2,max_height/2
+	gameDisplay.blit(rendering,area)	
 
 white=(255,255,255)
 black=(0,0,0)
 red=(255,0,0)
-snake_size=10
+snake_size=20
 apple_size=10
 clock=pygame.time.Clock()
+direction="down"
+
+snakehead=pygame.image.load('final.png')
 
 def snakecheck(all_points):
 	seen=[]
@@ -36,11 +41,23 @@ def snakecheck2(all_points):
 
 
 def snake(points):
-	for point in points:
+	
+	if(direction=="right"):
+		snakehead_disp=pygame.transform.rotate(snakehead,90)
+	elif(direction=="left"):
+		snakehead_disp=pygame.transform.rotate(snakehead,270)
+	elif(direction=="up"):
+		snakehead_disp=pygame.transform.rotate(snakehead,180)
+	else:
+		snakehead_disp=snakehead
+
+	gameDisplay.blit(snakehead_disp,(points[-1][0],points[-1][1]))
+	for point in points[:-1]:
 		pygame.draw.rect(gameDisplay,black,[point[0],point[1],snake_size,snake_size])
 
 
 def loop():
+	global direction
 	all_points=[]
 	snakelength=1
 	x=200
@@ -88,22 +105,26 @@ def loop():
 				if(event.key==pygame.K_LEFT):
 					speed_x=-speed
 					speed_y=0
+					direction="left"
 				elif(event.key==pygame.K_RIGHT):
 					speed_x=speed
 					speed_y=0
+					direction="right"
 				elif(event.key==pygame.K_UP):
 					speed_x=0
 					speed_y=-speed
+					direction="up"
 				elif(event.key==pygame.K_DOWN):
 					speed_x=0
 					speed_y=speed
-		if(x+20>max_width and speed_x>0):
+					direction="down"
+		if(x+snake_size+speed_x>=max_width and speed_x>0):
 			end=True
-		if(x<0 and speed_x<0):
+		if(x+speed_x<=0 and speed_x<0):
 			end=True
-		if(y+20>max_height and speed_y>0):
+		if(y+snake_size+speed_y>=max_height and speed_y>0):
 			end=True
-		if(y<0 and speed_y<0):
+		if(y+speed_y<0 and speed_y<0):
 			end=True
 		x+=speed_x
 		y+=speed_y
@@ -138,11 +159,28 @@ def loop():
 		# 	snakelength+=1
 
 
-		if(x>=apple_x and x<=apple_x+apple_size):
-			if(y>=apple_y and y<apple_y+apple_size):
-				apple_x=(random.randrange(0,max_width)/10)*10
-				apple_y=(random.randrange(0,max_height)/10)*10
-				snakelength+=1
+		# if(x>=apple_x and x<=apple_x+apple_size):
+		# 	if(y>=apple_y and y<apple_y+apple_size):
+		# 		apple_x=(random.randrange(0,max_width)/10)*10
+		# 		apple_y=(random.randrange(0,max_height)/10)*10
+		# 		snakelength+=1
+
+		isCollision=True
+		if(apple_x+apple_size<=x):
+			isCollision=False
+		elif(apple_x>=x+snake_size):
+			isCollision=False
+		else:
+			if(apple_y+apple_size<=y):
+				isCollision=False
+			elif(y+snake_size<=apple_y):
+				isCollision=False
+
+		if(isCollision==True):
+			apple_x=(random.randrange(0,max_width)/10)*10
+			apple_y=(random.randrange(0,max_height)/10)*10
+			snakelength+=1
+
 
 		clock.tick(30)
 	pygame.quit()
