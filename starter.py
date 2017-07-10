@@ -6,22 +6,36 @@ max_height=500
 gameDisplay=pygame.display.set_mode((max_width,max_height))
 pygame.display.set_caption("snake")
 
-font_chosen=pygame.font.SysFont(None,25)
-def write_text(message,color):
-	rendering=font_chosen.render(message,True,color)
-	area=rendering.get_rect()
-	area.center=max_width/2,max_height/2
-	gameDisplay.blit(rendering,area)	
+font_chosen_small=pygame.font.SysFont("comicsansms",25)
+font_chosen_medium=pygame.font.SysFont("comicsansms",45)
+font_chosen_large=pygame.font.SysFont("monospace",60)
+	
 
 white=(255,255,255)
 black=(0,0,0)
 red=(255,0,0)
+green=(0,255,0)
+yellow=(255,255,0)
 snake_size=20
 apple_size=10
 clock=pygame.time.Clock()
 direction="down"
 
 snakehead=pygame.image.load('final.png')
+
+
+
+def write_text(message,color,size,offset):
+	if(size=="small"):
+
+		rendering=font_chosen_small.render(message,True,color)
+	elif(size=="medium"):
+		rendering=font_chosen_medium.render(message,True,color)
+	else:
+		rendering=font_chosen_large.render(message,True,color)
+	area=rendering.get_rect()
+	area.center=max_width/2,max_height/2+offset
+	gameDisplay.blit(rendering,area)
 
 def snakecheck(all_points):
 	seen=[]
@@ -56,6 +70,24 @@ def snake(points):
 		pygame.draw.rect(gameDisplay,black,[point[0],point[1],snake_size,snake_size])
 
 
+
+
+def start_game():
+	starting=True
+	while(starting==True):
+		gameDisplay.fill(yellow)
+		write_text("Welcome to snake game",green,"medium",0)
+		write_text("Press space to play",red,"small",40)
+		pygame.display.update()
+		for event in pygame.event.get():
+			if event.type==pygame.KEYDOWN:
+				if(event.key==pygame.K_SPACE):
+					starting=False
+		
+
+
+
+
 def loop():
 	global direction
 	all_points=[]
@@ -78,8 +110,8 @@ def loop():
 		pygame.display.set_caption(str(apple_x)+" "+str(apple_y) )
 
 		while(end==True):
-
-			write_text("Press space key to play again",red)
+			write_text("Game over :)",red,"large",0)
+			write_text("Press space key to play again",red,"medium",60)
 			all_points=[]
 			pygame.display.update()
 			for event in pygame.event.get():
@@ -185,7 +217,7 @@ def loop():
 		clock.tick(30)
 	pygame.quit()
 	quit()
-
+start_game()
 loop()
 write_text("You lose",red)
 pygame.display.update()
