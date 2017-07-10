@@ -17,12 +17,12 @@ red=(255,0,0)
 green=(0,255,0)
 yellow=(255,255,0)
 snake_size=20
-apple_size=10
+apple_size=20
 clock=pygame.time.Clock()
 direction="down"
 
 snakehead=pygame.image.load('final.png')
-
+appleimage=pygame.image.load('Apple1.png')
 
 
 def write_text(message,color,size,offset):
@@ -166,7 +166,8 @@ def loop():
 		all_points.append(start_point)
 		
 		gameDisplay.fill(white)
-		pygame.draw.rect(gameDisplay,red,[apple_x,apple_y,apple_size,apple_size])
+		gameDisplay.blit(appleimage,(apple_x,apple_y))
+		# pygame.draw.rect(gameDisplay,red,[apple_x,apple_y,apple_size,apple_size])
 
 		if(len(all_points)>snakelength):
 			del all_points[0]
@@ -214,7 +215,7 @@ def loop():
 			snakelength+=1
 
 
-		clock.tick(30)
+		clock.tick(10)
 	pygame.quit()
 	quit()
 start_game()
