@@ -23,7 +23,7 @@ direction="down"
 
 snakehead=pygame.image.load('final.png')
 appleimage=pygame.image.load('Apple1.png')
-
+pygame.display.set_icon(appleimage)
 
 def write_text(message,color,size,offset):
 	if(size=="small"):
@@ -67,7 +67,7 @@ def snake(points):
 
 	gameDisplay.blit(snakehead_disp,(points[-1][0],points[-1][1]))
 	for point in points[:-1]:
-		pygame.draw.rect(gameDisplay,black,[point[0],point[1],snake_size,snake_size])
+		pygame.draw.rect(gameDisplay,green,[point[0],point[1],snake_size,snake_size])
 
 
 
@@ -103,8 +103,8 @@ def loop():
 	exit=False
 	end=False
 
-	apple_x=(random.randrange(0,max_width)/10)*10
-	apple_y=(random.randrange(0,max_height)/10)*10
+	apple_x=(random.randrange(0,max_width-apple_size)/10)*10
+	apple_y=(random.randrange(0,max_height-apple_size)/10)*10
 
 	while not exit:
 		pygame.display.set_caption(str(apple_x)+" "+str(apple_y) )
@@ -150,9 +150,9 @@ def loop():
 					speed_x=0
 					speed_y=speed
 					direction="down"
-		if(x+snake_size+speed_x>=max_width and speed_x>0):
+		if(x+snake_size+speed_x>max_width and speed_x>0):
 			end=True
-		if(x+speed_x<=0 and speed_x<0):
+		if(x+speed_x<0 and speed_x<0):
 			end=True
 		if(y+snake_size+speed_y>=max_height and speed_y>0):
 			end=True
@@ -167,6 +167,7 @@ def loop():
 		
 		gameDisplay.fill(white)
 		gameDisplay.blit(appleimage,(apple_x,apple_y))
+
 		# pygame.draw.rect(gameDisplay,red,[apple_x,apple_y,apple_size,apple_size])
 
 		if(len(all_points)>snakelength):
@@ -210,12 +211,12 @@ def loop():
 				isCollision=False
 
 		if(isCollision==True):
-			apple_x=(random.randrange(0,max_width)/10)*10
-			apple_y=(random.randrange(0,max_height)/10)*10
+			apple_x=(random.randrange(0,max_width-apple_size)/10)*10
+			apple_y=(random.randrange(0,max_height-apple_size)/10)*10
 			snakelength+=1
 
 
-		clock.tick(10)
+		clock.tick(20)
 	pygame.quit()
 	quit()
 start_game()
